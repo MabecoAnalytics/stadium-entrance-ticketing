@@ -41,7 +41,7 @@ export default function TopNav() {
 
         <div className="flex items-center gap-2 bg-amber-50 border border-amber-300 text-cfm-amber px-3 py-1.5 rounded-full text-xs font-semibold whitespace-nowrap">
           <AlertTriangle size={14} />
-          Demo — Não para uso operacional
+          Demo - Não para uso operacional
         </div>
       </div>
     </header>

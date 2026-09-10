@@ -84,7 +84,7 @@ export default function Report() {
         </div>
 
         <div className="bg-white rounded-xl border border-black/10 shadow-sm p-5">
-          <h3 className="text-sm font-bold text-cfm-dark mb-3">Fluxo de Entradas — Evento Completo</h3>
+          <h3 className="text-sm font-bold text-cfm-dark mb-3">Fluxo de Entradas - Evento Completo</h3>
           <ResponsiveContainer width="100%" height={260}>
             <AreaChart data={FULL_EVENT_TIMELINE} margin={{ top: 8, right: 16, left: -16, bottom: 4 }}>
               <defs>
@@ -108,7 +108,7 @@ export default function Report() {
       </div>
 
       <div className="bg-white rounded-xl border border-black/10 shadow-sm p-5 mb-8 overflow-x-auto">
-        <h3 className="text-sm font-bold text-cfm-dark mb-3">Método de Pagamento — Detalhe</h3>
+        <h3 className="text-sm font-bold text-cfm-dark mb-3">Método de Pagamento - Detalhe</h3>
         <table className="w-full text-sm">
           <thead>
             <tr className="text-left text-cfm-dark/40 text-xs uppercase tracking-wide border-b border-black/5">

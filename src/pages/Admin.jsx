@@ -31,7 +31,7 @@ export default function Admin() {
           >
             {EVENTS.map((e) => (
               <option key={e.id} value={e.id}>
-                {e.name} — {e.dateLabel}
+                {e.name} - {e.dateLabel}
               </option>
             ))}
           </select>

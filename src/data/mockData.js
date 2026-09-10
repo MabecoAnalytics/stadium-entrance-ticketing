@@ -1,6 +1,6 @@
 // Mock data for the CFM Stadium Entrance Management demo.
 // Everything here is hardcoded or deterministically generated in-memory.
-// No network calls, no persistence — safe for an offline boardroom demo.
+// No network calls, no persistence - safe for an offline boardroom demo.
 
 export const CFM_NAME = 'Portos e Caminhos de Ferro de Moçambique'
 
@@ -199,13 +199,13 @@ export function generateRecentTransactions(count = 10) {
 export const RECENT_TRANSACTIONS = generateRecentTransactions(10)
 
 export const GATES = [
-  { id: 'gate-n1', label: 'Entrada Norte — Porta 1', validated: 412, invalid: 9, status: 'Activa' },
-  { id: 'gate-n2', label: 'Entrada Norte — Porta 2', validated: 388, invalid: 14, status: 'Activa' },
-  { id: 'gate-n3', label: 'Entrada Norte — Porta 3', validated: 356, invalid: 7, status: 'Activa' },
-  { id: 'gate-s1', label: 'Entrada Sul — Porta 1', validated: 341, invalid: 11, status: 'Activa' },
-  { id: 'gate-s2', label: 'Entrada Sul — Porta 2', validated: 0, invalid: 0, status: 'Offline' },
-  { id: 'gate-v1', label: 'Entrada VIP — Porta 1', validated: 198, invalid: 2, status: 'Activa' },
-  { id: 'gate-v2', label: 'Entrada VIP — Porta 2', validated: 174, invalid: 3, status: 'Activa' },
+  { id: 'gate-n1', label: 'Entrada Norte - Porta 1', validated: 412, invalid: 9, status: 'Activa' },
+  { id: 'gate-n2', label: 'Entrada Norte - Porta 2', validated: 388, invalid: 14, status: 'Activa' },
+  { id: 'gate-n3', label: 'Entrada Norte - Porta 3', validated: 356, invalid: 7, status: 'Activa' },
+  { id: 'gate-s1', label: 'Entrada Sul - Porta 1', validated: 341, invalid: 11, status: 'Activa' },
+  { id: 'gate-s2', label: 'Entrada Sul - Porta 2', validated: 0, invalid: 0, status: 'Offline' },
+  { id: 'gate-v1', label: 'Entrada VIP - Porta 1', validated: 198, invalid: 2, status: 'Activa' },
+  { id: 'gate-v2', label: 'Entrada VIP - Porta 2', validated: 174, invalid: 3, status: 'Activa' },
 ]
 
 export const SALES_BY_PAYMENT_METHOD = [

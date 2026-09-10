@@ -3,7 +3,7 @@ import { ScanLine, CheckCircle2, XCircle, Clock, Activity } from 'lucide-react'
 import HelpButton from '../components/HelpButton.jsx'
 import { SCAN_VALID_SAMPLES, INVALID_SCAN_REASONS } from '../data/mockData.js'
 
-const GATE_LABEL = 'Entrada Norte — Porta 3'
+const GATE_LABEL = 'Entrada Norte - Porta 3'
 
 export default function Gate() {
   const [result, setResult] = useState(null) // { type: 'valid'|'invalid', ...details }
@@ -116,7 +116,7 @@ export default function Gate() {
 
           <div className="mt-5 pt-5 border-t border-black/5 flex items-center gap-2 text-xs text-cfm-dark/50">
             <Clock size={13} />
-            Última leitura: {stats.lastScan ?? '—'}
+            Última leitura: {stats.lastScan ?? '-'}
           </div>
 
           <div className="mt-5 pt-5 border-t border-black/5">

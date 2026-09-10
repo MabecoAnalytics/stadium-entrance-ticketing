@@ -24,7 +24,7 @@ export default function StepConfirmation({ eventId, categoryId, buyer, ticketId 
       </div>
       <h2 className="text-2xl font-bold text-cfm-dark mb-1">Bilhete emitido com sucesso!</h2>
       <p className="text-cfm-dark/50 text-sm mb-8">
-        Guarde o QR code abaixo — será solicitado na entrada do estádio.
+        Guarde o QR code abaixo - será solicitado na entrada do estádio.
       </p>
 
       <div className="bg-white rounded-2xl border border-black/10 shadow-lg p-8">
@@ -38,7 +38,7 @@ export default function StepConfirmation({ eventId, categoryId, buyer, ticketId 
           <Row label="Nº do Bilhete" value={ticketId.split('-')[0].toUpperCase()} mono />
           <Row label="Evento" value={event.name} />
           <Row label="Data" value={`${event.dateLabel} · ${event.time}`} />
-          <Row label="Categoria" value={`${category.label} — ${formatMTn(category.price)}`} />
+          <Row label="Categoria" value={`${category.label} - ${formatMTn(category.price)}`} />
           <Row label="Comprador" value={buyer.name} />
         </div>
 

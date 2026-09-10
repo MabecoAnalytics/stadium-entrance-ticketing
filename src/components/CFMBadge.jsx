@@ -6,7 +6,7 @@ export default function CFMBadge({ size = 'md' }) {
     <div className="flex items-center gap-3">
       <img
         src={cfmLogo}
-        alt="CFM — ampliando horizontes"
+        alt="CFM - ampliando horizontes"
         className={isLg ? 'h-14 w-auto' : 'h-9 w-auto'}
       />
       <div className={`flex flex-col leading-tight border-l border-black/10 ${isLg ? 'pl-4' : 'pl-3'}`}>

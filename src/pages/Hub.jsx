@@ -41,7 +41,7 @@ export default function Hub() {
           Demonstração interactiva
         </p>
         <h1 className="text-4xl font-extrabold text-cfm-dark mb-4">
-          Sistema de Gestão de Entradas — CFM
+          Sistema de Gestão de Entradas - CFM
         </h1>
         <p className="text-cfm-dark/60 max-w-2xl mx-auto text-base">
           Bilhética digital e controlo de acessos para o Estádio da Machava. Seleccione uma secção
@@ -72,7 +72,7 @@ export default function Hub() {
       </div>
 
       <div className="mt-14 text-center text-xs text-cfm-dark/40">
-        Estádio da Machava · Maputo, Moçambique — demonstração com dados fictícios
+        Estádio da Machava · Maputo, Moçambique - demonstração com dados fictícios
       </div>
 
       <HelpButton text="Esta é a página inicial da demonstração. Escolha uma das quatro secções para explorar cada fluxo do sistema." />

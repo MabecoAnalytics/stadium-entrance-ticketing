@@ -53,7 +53,7 @@ export default function StepPayment({ methodId, onSelectMethod, categoryId, onBa
       {method && (
         <div className="bg-cfm-dark rounded-xl p-5 mb-8 font-mono text-sm text-green-300 shadow-inner animate-fade-in">
           <div className="flex items-center gap-2 text-white/70 mb-2 font-sans font-semibold text-xs uppercase tracking-wide">
-            <ShieldCheck size={14} /> Simulação USSD — {method.label}
+            <ShieldCheck size={14} /> Simulação USSD - {method.label}
           </div>
           <p className="leading-relaxed break-words">
             <span className="text-white">{method.ussd}</span> → Confirmar pagamento de{' '}

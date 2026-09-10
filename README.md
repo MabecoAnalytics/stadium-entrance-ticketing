@@ -1,8 +1,8 @@
-# Sistema de Gestão de Entradas — CFM (Demo)
+# Sistema de Gestão de Entradas - CFM (Demo)
 
 Clickable mockup of a stadium digital ticketing and entrance-control system for
 CFM (Portos e Caminhos de Ferro de Moçambique). Everything is client-side and
-hardcoded/in-memory — there is no backend, no database, and no network calls at
+hardcoded/in-memory - there is no backend, no database, and no network calls at
 runtime, so the demo runs fully offline.
 
 ## Run it

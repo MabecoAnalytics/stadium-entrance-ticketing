@@ -1,9 +1,14 @@
 import { useEffect, useRef, useState } from 'react'
-import { ScanLine, CheckCircle2, XCircle, Clock, Activity } from 'lucide-react'
+import { ScanLine, CheckCircle2, XCircle, Clock, Activity, Cpu } from 'lucide-react'
 import HelpButton from '../components/HelpButton.jsx'
-import { SCAN_VALID_SAMPLES, INVALID_SCAN_REASONS } from '../data/mockData.js'
+import {
+  INVALID_SCAN_REASONS, GATES, EVENTS,
+  getBlockById, getEquipmentById, generateValidScanForGate, generateWrongBlockAttemptForGate,
+} from '../data/mockData.js'
 
-const GATE_LABEL = 'Entrada Norte - Porta 3'
+const GATE = GATES.find((g) => g.id === 'gate-n3')
+const BLOCK = getBlockById(GATE.blockId)
+const EQUIPMENT = GATE.equipmentIds.map(getEquipmentById)
 
 export default function Gate() {
   const [result, setResult] = useState(null) // { type: 'valid'|'invalid', ...details }
@@ -18,11 +23,12 @@ export default function Gate() {
     const timeLabel = now.toLocaleTimeString('pt-PT', { hour: '2-digit', minute: '2-digit', second: '2-digit' })
 
     if (isValid) {
-      const sample = SCAN_VALID_SAMPLES[Math.floor(Math.random() * SCAN_VALID_SAMPLES.length)]
+      const sample = generateValidScanForGate(GATE, EVENTS[0].name)
       setResult({ type: 'valid', ...sample, time: timeLabel })
     } else {
       const reason = INVALID_SCAN_REASONS[Math.floor(Math.random() * INVALID_SCAN_REASONS.length)]
-      setResult({ type: 'invalid', reason, time: timeLabel })
+      const detail = reason.id === 'wrong-block' ? generateWrongBlockAttemptForGate(GATE) : null
+      setResult({ type: 'invalid', reason, detail, time: timeLabel })
     }
 
     setStats((s) => ({
@@ -40,7 +46,7 @@ export default function Gate() {
       <div className="grid grid-cols-1 lg:grid-cols-[1fr_320px] gap-8">
         <div className="bg-white rounded-2xl border border-black/10 shadow-md p-10 flex flex-col items-center justify-center min-h-[520px] relative overflow-hidden">
           <p className="text-xs font-bold uppercase tracking-widest text-cfm-emerald mb-1">
-            {GATE_LABEL}
+            {GATE.label}
           </p>
           <h2 className="text-xl font-bold text-cfm-dark mb-8">Scanner de Bilhetes</h2>
 
@@ -83,17 +89,23 @@ export default function Gate() {
                     <h3 className="text-2xl font-extrabold mb-1">Entrada Autorizada</h3>
                     <p className="font-semibold">{result.name}</p>
                     <p className="text-sm opacity-90">{result.event}</p>
-                    <p className="text-sm opacity-90 mb-3">Categoria: {result.category}</p>
+                    <p className="text-sm opacity-90">Categoria: {result.category}</p>
+                    <p className="text-sm opacity-90 mb-3">{result.block} · {result.seat}</p>
                     <p className="text-xs opacity-80">
-                      {result.time} · {GATE_LABEL}
+                      {result.time} · {GATE.label}
                     </p>
                   </>
                 ) : (
                   <>
                     <h3 className="text-2xl font-extrabold mb-1">Entrada Recusada</h3>
-                    <p className="font-semibold">{result.reason}</p>
+                    <p className="font-semibold">{result.reason.label}</p>
+                    {result.detail && (
+                      <p className="text-sm opacity-90 mt-1">
+                        {result.detail.name} · bilhete é para {result.detail.ticketBlock}
+                      </p>
+                    )}
                     <p className="text-xs opacity-80 mt-3">
-                      {result.time} · {GATE_LABEL}
+                      {result.time} · {GATE.label}
                     </p>
                   </>
                 )}
@@ -121,10 +133,25 @@ export default function Gate() {
 
           <div className="mt-5 pt-5 border-t border-black/5">
             <p className="text-xs text-cfm-dark/40 mb-1">Porta</p>
-            <p className="text-sm font-bold text-cfm-dark">{GATE_LABEL}</p>
+            <p className="text-sm font-bold text-cfm-dark">{GATE.label}</p>
+            <p className="text-xs text-cfm-dark/50 mt-1">{BLOCK.name}</p>
             <span className="inline-block mt-2 text-xs font-semibold text-cfm-success bg-green-50 px-2.5 py-1 rounded-full">
               ● Activa
             </span>
+          </div>
+
+          <div className="mt-5 pt-5 border-t border-black/5">
+            <div className="flex items-center gap-1.5 text-xs text-cfm-dark/40 mb-2">
+              <Cpu size={13} />
+              Equipamento
+            </div>
+            <ul className="space-y-1.5">
+              {EQUIPMENT.map((eq) => (
+                <li key={eq.id} className="text-xs text-cfm-dark/70">
+                  <span className="font-semibold text-cfm-dark">{eq.name}</span> · {eq.type}
+                </li>
+              ))}
+            </ul>
           </div>
         </aside>
       </div>

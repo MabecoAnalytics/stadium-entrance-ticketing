@@ -5,7 +5,10 @@ import StepEvent from '../components/purchase/StepEvent.jsx'
 import StepBuyer from '../components/purchase/StepBuyer.jsx'
 import StepPayment from '../components/purchase/StepPayment.jsx'
 import StepConfirmation from '../components/purchase/StepConfirmation.jsx'
-import { EVENTS, MOCK_BUYER_DEFAULTS, generateTicketId } from '../data/mockData.js'
+import {
+  EVENTS, MOCK_BUYER_DEFAULTS, generateTicketId,
+  getBlocksByCategory, generateSeatForBlock, getBlockById,
+} from '../data/mockData.js'
 
 const HELP_TEXT = {
   1: 'Passo 1: o cliente escolhe o jogo e a categoria de bilhete (Geral, VIP ou Camarote).',
@@ -14,10 +17,14 @@ const HELP_TEXT = {
   4: 'Passo 4: bilhete emitido com QR code único, enviado por WhatsApp e email.',
 }
 
+const initialBlocks = getBlocksByCategory('geral')
+
 export default function Purchase() {
   const [step, setStep] = useState(1)
   const [eventId, setEventId] = useState(EVENTS[0].id)
   const [categoryId, setCategoryId] = useState('geral')
+  const [blockId, setBlockId] = useState(initialBlocks.length === 1 ? initialBlocks[0].id : '')
+  const [seat, setSeat] = useState('')
   const [methodId, setMethodId] = useState('mpesa')
   const [buyer, setBuyer] = useState(MOCK_BUYER_DEFAULTS)
   const [ticketId, setTicketId] = useState('')
@@ -25,8 +32,15 @@ export default function Purchase() {
   const goNext = () => setStep((s) => Math.min(s + 1, 4))
   const goBack = () => setStep((s) => Math.max(s - 1, 1))
 
+  const handleSelectCategory = (newCategoryId) => {
+    setCategoryId(newCategoryId)
+    const blocks = getBlocksByCategory(newCategoryId)
+    setBlockId(blocks.length === 1 ? blocks[0].id : '')
+  }
+
   const handlePaid = () => {
     setTicketId(generateTicketId())
+    setSeat(generateSeatForBlock(getBlockById(blockId)))
     goNext()
   }
 
@@ -38,8 +52,10 @@ export default function Purchase() {
         <StepEvent
           eventId={eventId}
           categoryId={categoryId}
+          blockId={blockId}
           onSelectEvent={setEventId}
-          onSelectCategory={setCategoryId}
+          onSelectCategory={handleSelectCategory}
+          onSelectBlock={setBlockId}
           onNext={goNext}
         />
       )}
@@ -59,6 +75,8 @@ export default function Purchase() {
         <StepConfirmation
           eventId={eventId}
           categoryId={categoryId}
+          blockId={blockId}
+          seat={seat}
           buyer={buyer}
           ticketId={ticketId}
         />

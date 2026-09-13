@@ -3,13 +3,19 @@ import {
   BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, LabelList, Cell,
   LineChart, Line, ResponsiveContainer,
 } from 'recharts'
-import { Ticket, Wallet, PieChart as PieIcon, ShieldCheck, ChevronDown } from 'lucide-react'
+import { Ticket, Wallet, PieChart as PieIcon, ShieldCheck, ChevronDown, LayoutGrid, MonitorCheck } from 'lucide-react'
 import HelpButton from '../components/HelpButton.jsx'
 import KpiCard from '../components/KpiCard.jsx'
 import {
   EVENTS, ADMIN_KPIS, SALES_BY_PAYMENT_METHOD, ENTRIES_TIMELINE,
-  GATES, RECENT_TRANSACTIONS, formatMTn, formatNumber,
+  GATES, BLOCKS, RECENT_TRANSACTIONS, getBlockById, formatMTn, formatNumber,
 } from '../data/mockData.js'
+
+function equipmentShortLabel(gate) {
+  return gate.equipmentIds.includes('android-pos') ? 'POS Portátil' : 'Torniquete + Facial/QR'
+}
+
+const ONLINE_COUNT = GATES.filter((g) => g.status === 'Activa').length
 
 export default function Admin() {
   const [eventId, setEventId] = useState(EVENTS[0].id)
@@ -71,6 +77,85 @@ export default function Admin() {
         />
       </div>
 
+      <div className="bg-white rounded-xl border border-black/10 shadow-sm p-5 mb-8">
+        <div className="flex items-center justify-between mb-4">
+          <div className="flex items-center gap-2">
+            <MonitorCheck size={16} className="text-cfm-emerald" />
+            <h3 className="text-sm font-bold text-cfm-dark">Painel Central de Controlo de Equipamento</h3>
+          </div>
+          <span className="text-xs font-semibold text-cfm-dark/50">
+            {ONLINE_COUNT} / {GATES.length} equipamentos online
+          </span>
+        </div>
+        <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 gap-3">
+          {GATES.map((gate) => {
+            const online = gate.status === 'Activa'
+            const block = getBlockById(gate.blockId)
+            return (
+              <div
+                key={gate.id}
+                className={`rounded-lg border p-3 ${online ? 'border-black/5' : 'border-amber-200 bg-amber-50/40'}`}
+              >
+                <div className="flex items-center gap-1.5 mb-2">
+                  <span className="relative flex h-2 w-2">
+                    {online && (
+                      <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-cfm-success opacity-60" />
+                    )}
+                    <span
+                      className="relative inline-flex rounded-full h-2 w-2"
+                      style={{ backgroundColor: online ? '#16A34A' : '#D97706' }}
+                    />
+                  </span>
+                  <span className={`text-xs font-bold ${online ? 'text-cfm-success' : 'text-cfm-amber'}`}>
+                    {online ? 'Online' : 'Offline'}
+                  </span>
+                </div>
+                <p className="text-xs font-semibold text-cfm-dark leading-snug">{gate.label}</p>
+                <p className="text-[11px] text-cfm-dark/50">{block.shortLabel}</p>
+                <p className="text-[11px] text-cfm-dark/40 mt-1">{equipmentShortLabel(gate)}</p>
+              </div>
+            )
+          })}
+        </div>
+      </div>
+
+      <div className="bg-white rounded-xl border border-black/10 shadow-sm p-5 mb-8">
+        <div className="flex items-center gap-2 mb-4">
+          <LayoutGrid size={16} className="text-cfm-emerald" />
+          <h3 className="text-sm font-bold text-cfm-dark">Ocupação por Bloco</h3>
+        </div>
+        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
+          {BLOCKS.map((block) => {
+            const pct = Math.round((block.occupied / block.capacity) * 100)
+            const full = pct >= 100
+            return (
+              <div key={block.id} className="border border-black/5 rounded-lg p-4">
+                <div className="flex items-center justify-between mb-1">
+                  <span className="text-sm font-semibold text-cfm-dark">{block.name}</span>
+                  <span className={`text-xs font-bold ${full ? 'text-cfm-amber' : 'text-cfm-dark/60'}`}>
+                    {pct}%
+                  </span>
+                </div>
+                <p className="text-xs text-cfm-dark/50 mb-2">
+                  {formatNumber(block.occupied)} / {formatNumber(block.capacity)} lugares
+                </p>
+                <div className="h-1.5 rounded-full bg-black/5 overflow-hidden">
+                  <div
+                    className="h-full rounded-full"
+                    style={{ width: `${Math.min(pct, 100)}%`, backgroundColor: full ? '#D97706' : '#0A7F3C' }}
+                  />
+                </div>
+                {full && (
+                  <span className="inline-block mt-2 text-xs font-semibold text-cfm-amber bg-amber-50 px-2 py-0.5 rounded-full">
+                    Lotado
+                  </span>
+                )}
+              </div>
+            )
+          })}
+        </div>
+      </div>
+
       <div className="grid grid-cols-1 lg:grid-cols-2 gap-6 mb-8">
         <ChartCard title="Vendas por Método de Pagamento">
           <ResponsiveContainer width="100%" height={220}>
@@ -98,7 +183,7 @@ export default function Admin() {
           </ResponsiveContainer>
         </ChartCard>
 
-        <ChartCard title="Entradas por Intervalo (17:00 – 19:30)">
+        <ChartCard title="Entradas por Intervalo (17:00 a 19:30)">
           <ResponsiveContainer width="100%" height={220}>
             <LineChart data={ENTRIES_TIMELINE} margin={{ top: 8, right: 16, left: -16, bottom: 4 }}>
               <CartesianGrid vertical={false} stroke="#e7ede9" />
@@ -121,6 +206,7 @@ export default function Admin() {
             <thead>
               <tr className="text-left text-cfm-dark/40 text-xs uppercase tracking-wide border-b border-black/5">
                 <th className="py-2 pr-2 font-semibold">Porta</th>
+                <th className="py-2 pr-2 font-semibold">Equipamento</th>
                 <th className="py-2 pr-2 font-semibold text-right">Válidas</th>
                 <th className="py-2 pr-2 font-semibold text-right">Inválidas</th>
                 <th className="py-2 pl-2 font-semibold text-right">Estado</th>
@@ -130,6 +216,7 @@ export default function Admin() {
               {GATES.map((g) => (
                 <tr key={g.id} className="border-b border-black/5 last:border-0">
                   <td className="py-2.5 pr-2 font-medium text-cfm-dark">{g.label}</td>
+                  <td className="py-2.5 pr-2 text-cfm-dark/50 text-xs">{equipmentShortLabel(g)}</td>
                   <td className="py-2.5 pr-2 text-right text-cfm-dark/70">{formatNumber(g.validated)}</td>
                   <td className="py-2.5 pr-2 text-right text-cfm-dark/70">{formatNumber(g.invalid)}</td>
                   <td className="py-2.5 pl-2 text-right">
@@ -154,6 +241,7 @@ export default function Admin() {
             <thead>
               <tr className="text-left text-cfm-dark/40 text-xs uppercase tracking-wide border-b border-black/5">
                 <th className="py-2 pr-2 font-semibold">Cliente</th>
+                <th className="py-2 pr-2 font-semibold">Bloco</th>
                 <th className="py-2 pr-2 font-semibold">Método</th>
                 <th className="py-2 pr-2 font-semibold text-right">Valor</th>
                 <th className="py-2 pl-2 font-semibold text-right">Hora</th>
@@ -163,6 +251,7 @@ export default function Admin() {
               {RECENT_TRANSACTIONS.map((t) => (
                 <tr key={t.id} className="border-b border-black/5 last:border-0">
                   <td className="py-2.5 pr-2 font-medium text-cfm-dark">{t.name}</td>
+                  <td className="py-2.5 pr-2 text-cfm-dark/60 text-xs">{t.block}</td>
                   <td className="py-2.5 pr-2">
                     <span className="inline-flex items-center gap-1.5 text-xs font-semibold" style={{ color: t.methodColor }}>
                       <span className="w-1.5 h-1.5 rounded-full" style={{ backgroundColor: t.methodColor }} />

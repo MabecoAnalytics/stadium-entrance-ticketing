@@ -1,7 +1,8 @@
 import { Calendar, MapPin, Check } from 'lucide-react'
-import { EVENTS, TICKET_CATEGORIES, formatMTn } from '../../data/mockData.js'
+import { EVENTS, TICKET_CATEGORIES, getBlocksByCategory, formatMTn, formatNumber } from '../../data/mockData.js'
 
-export default function StepEvent({ eventId, categoryId, onSelectEvent, onSelectCategory, onNext }) {
+export default function StepEvent({ eventId, categoryId, blockId, onSelectEvent, onSelectCategory, onSelectBlock, onNext }) {
+  const blocksForCategory = categoryId ? getBlocksByCategory(categoryId) : []
   return (
     <div className="animate-fade-in">
       <h2 className="text-2xl font-bold text-cfm-dark mb-1">Escolher Evento</h2>
@@ -77,10 +78,53 @@ export default function StepEvent({ eventId, categoryId, onSelectEvent, onSelect
         })}
       </div>
 
+      {blocksForCategory.length > 1 && (
+        <>
+          <h3 className="font-bold text-cfm-dark mb-3">Escolha o bloco</h3>
+          <div className="grid grid-cols-1 md:grid-cols-3 gap-4 mb-8">
+            {blocksForCategory.map((block) => {
+              const selected = block.id === blockId
+              const pct = Math.round((block.occupied / block.capacity) * 100)
+              const full = pct >= 100
+              return (
+                <button
+                  key={block.id}
+                  onClick={() => onSelectBlock(block.id)}
+                  className={`rounded-xl border-2 p-5 text-left transition-all bg-white ${
+                    selected
+                      ? 'border-cfm-emerald shadow-lg ring-2 ring-cfm-emerald/15'
+                      : 'border-black/10 hover:border-cfm-emerald/40 hover:shadow-md'
+                  }`}
+                >
+                  <div className="flex items-center justify-between mb-2">
+                    <span className="font-bold text-cfm-dark">{block.name}</span>
+                    {selected && (
+                      <div className="w-5 h-5 rounded-full bg-cfm-emerald flex items-center justify-center">
+                        <Check size={12} className="text-white" />
+                      </div>
+                    )}
+                  </div>
+                  <p className="text-xs text-cfm-dark/50 mb-2">
+                    {formatNumber(block.occupied)} / {formatNumber(block.capacity)} lugares
+                  </p>
+                  <span
+                    className={`text-xs font-semibold px-2 py-0.5 rounded-full ${
+                      full ? 'bg-amber-50 text-cfm-amber' : 'bg-green-50 text-cfm-success'
+                    }`}
+                  >
+                    {full ? 'Lotado' : `${pct}% ocupado`}
+                  </span>
+                </button>
+              )
+            })}
+          </div>
+        </>
+      )}
+
       <div className="flex justify-end">
         <button
           onClick={onNext}
-          disabled={!eventId || !categoryId}
+          disabled={!eventId || !categoryId || !blockId}
           className="px-8 py-3 rounded-lg bg-cfm-emerald text-white font-semibold shadow-sm hover:bg-cfm-mid disabled:opacity-40 disabled:cursor-not-allowed transition-colors"
         >
           Continuar

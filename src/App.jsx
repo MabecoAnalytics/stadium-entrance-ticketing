@@ -5,6 +5,7 @@ import Purchase from './pages/Purchase.jsx'
 import Gate from './pages/Gate.jsx'
 import Admin from './pages/Admin.jsx'
 import Report from './pages/Report.jsx'
+import Settings from './pages/Settings.jsx'
 
 export default function App() {
   return (
@@ -16,6 +17,7 @@ export default function App() {
         <Route path="/gate" element={<Gate />} />
         <Route path="/admin" element={<Admin />} />
         <Route path="/relatorio" element={<Report />} />
+        <Route path="/parametrizacao" element={<Settings />} />
       </Routes>
     </div>
   )

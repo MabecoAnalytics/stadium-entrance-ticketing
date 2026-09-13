@@ -4,10 +4,11 @@ import CFMBadge from './CFMBadge.jsx'
 
 const LINKS = [
   { to: '/', label: 'Início' },
-  { to: '/compra', label: 'Compra de Bilhete' },
-  { to: '/gate', label: 'Validação na Entrada' },
-  { to: '/admin', label: 'Painel Administrativo' },
-  { to: '/relatorio', label: 'Relatório de Evento' },
+  { to: '/compra', label: 'Compra' },
+  { to: '/gate', label: 'Validação' },
+  { to: '/admin', label: 'Painel' },
+  { to: '/relatorio', label: 'Relatório' },
+  { to: '/parametrizacao', label: 'Parametrização' },
 ]
 
 export default function TopNav() {
@@ -20,14 +21,14 @@ export default function TopNav() {
           <CFMBadge />
         </Link>
 
-        <nav className="hidden lg:flex items-center gap-1 bg-cfm-bg rounded-full p-1">
+        <nav className="hidden lg:flex items-center gap-0.5 bg-cfm-bg rounded-full p-1 overflow-x-auto max-w-full">
           {LINKS.map((link) => {
             const active = location.pathname === link.to
             return (
               <Link
                 key={link.to}
                 to={link.to}
-                className={`px-4 py-1.5 rounded-full text-sm font-medium transition-colors ${
+                className={`px-3 py-1.5 rounded-full text-xs font-medium whitespace-nowrap transition-colors ${
                   active
                     ? 'bg-cfm-emerald text-white shadow-sm'
                     : 'text-cfm-dark/70 hover:text-cfm-dark hover:bg-white'

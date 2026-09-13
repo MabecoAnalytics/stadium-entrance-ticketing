@@ -1,12 +1,13 @@
 import { useRef } from 'react'
 import { QRCodeCanvas } from 'qrcode.react'
 import { Download, MessageCircle, Mail, CheckCircle2 } from 'lucide-react'
-import { EVENTS, TICKET_CATEGORIES, formatMTn } from '../../data/mockData.js'
+import { EVENTS, TICKET_CATEGORIES, getBlockById, formatMTn } from '../../data/mockData.js'
 
-export default function StepConfirmation({ eventId, categoryId, buyer, ticketId }) {
+export default function StepConfirmation({ eventId, categoryId, blockId, seat, buyer, ticketId }) {
   const canvasWrapRef = useRef(null)
   const event = EVENTS.find((e) => e.id === eventId)
   const category = TICKET_CATEGORIES.find((c) => c.id === categoryId)
+  const block = getBlockById(blockId)
 
   const handleDownload = () => {
     const canvas = canvasWrapRef.current?.querySelector('canvas')
@@ -39,6 +40,8 @@ export default function StepConfirmation({ eventId, categoryId, buyer, ticketId 
           <Row label="Evento" value={event.name} />
           <Row label="Data" value={`${event.dateLabel} · ${event.time}`} />
           <Row label="Categoria" value={`${category.label} - ${formatMTn(category.price)}`} />
+          <Row label="Bloco" value={block.name} />
+          <Row label="Lugar" value={seat} />
           <Row label="Comprador" value={buyer.name} />
         </div>
 

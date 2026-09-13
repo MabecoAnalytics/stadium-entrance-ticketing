@@ -34,6 +34,96 @@ export const TICKET_CATEGORIES = [
   { id: 'camarote', label: 'Camarote', price: 1500 },
 ]
 
+// Physical stadium blocks (bancadas), each tied to a category and one or
+// more entrance gates. Capacity/occupied figures sum to EVENTS[0].capacity
+// (5000) and EVENTS[0].sold (3847) respectively, so block-level occupancy
+// stays consistent with the event-level KPIs shown elsewhere.
+export const BLOCKS = [
+  {
+    id: 'bloco-geral-norte',
+    name: 'Bloco Geral Norte',
+    shortLabel: 'Geral Norte',
+    categoryId: 'geral',
+    capacity: 2200,
+    occupied: 1980,
+  },
+  {
+    id: 'bloco-geral-sul',
+    name: 'Bloco Geral Sul',
+    shortLabel: 'Geral Sul',
+    categoryId: 'geral',
+    capacity: 1500,
+    occupied: 780,
+  },
+  {
+    id: 'bloco-vip',
+    name: 'Bloco VIP',
+    shortLabel: 'VIP',
+    categoryId: 'vip',
+    capacity: 900,
+    occupied: 900,
+  },
+  {
+    id: 'bloco-camarote',
+    name: 'Bloco Camarote',
+    shortLabel: 'Camarote',
+    categoryId: 'camarote',
+    capacity: 400,
+    occupied: 187,
+  },
+]
+
+export function getBlockById(blockId) {
+  return BLOCKS.find((b) => b.id === blockId)
+}
+
+export function getBlocksByCategory(categoryId) {
+  return BLOCKS.filter((b) => b.categoryId === categoryId)
+}
+
+export function getGatesForBlock(blockId) {
+  return GATES.filter((g) => g.blockId === blockId)
+}
+
+// Equipment referenced by the CFM team for the physical access-control setup.
+export const EQUIPMENT_CATALOG = [
+  {
+    id: 'hikvision',
+    name: 'Hikvision DS-K1T672MFWX-Wi-Fi',
+    type: 'Terminal de controlo de acesso facial e QR code, Wi-Fi',
+    usage: 'Leitor instalado nos torniquetes de Geral e VIP',
+  },
+  {
+    id: 'turnstar',
+    name: 'Turnstar TITAN',
+    type: 'Torniquete de corpo inteiro (full height turnstile)',
+    usage: 'Barreira física nas entradas de Geral e VIP',
+  },
+  {
+    id: 'android-pos',
+    name: 'POS Android portátil',
+    type: 'Ecrã 5.5", scanner de código de barras 1D/2D, impressora térmica 58mm, NFC, 4G',
+    usage: 'Validação manual no acesso reservado aos Camarotes',
+  },
+]
+
+export function getEquipmentById(equipmentId) {
+  return EQUIPMENT_CATALOG.find((e) => e.id === equipmentId)
+}
+
+// Live seat assignment for tickets purchased during the demo (not the seeded
+// mock rows below, which use the deterministic rng for a stable dataset).
+export function generateSeatForBlock(block) {
+  if (!block) return ''
+  if (block.categoryId === 'camarote') {
+    const num = Math.floor(Math.random() * block.capacity) + 1
+    return `Camarote ${String(num).padStart(2, '0')}`
+  }
+  const row = Math.floor(Math.random() * 30) + 1
+  const seat = Math.floor(Math.random() * 40) + 1
+  return `Fila ${row}, Lugar ${String(seat).padStart(3, '0')}`
+}
+
 export const EVENTS = [
   {
     id: 'evt-1',
@@ -172,12 +262,23 @@ function categoryByWeight() {
   return TICKET_CATEGORIES[2]
 }
 
+function seededSeatForBlock(block) {
+  if (block.categoryId === 'camarote') {
+    const num = Math.floor(rng() * block.capacity) + 1
+    return `Camarote ${String(num).padStart(2, '0')}`
+  }
+  const row = Math.floor(rng() * 30) + 1
+  const seat = Math.floor(rng() * 40) + 1
+  return `Fila ${row}, Lugar ${String(seat).padStart(3, '0')}`
+}
+
 export function generateRecentTransactions(count = 10) {
   const now = new Date('2025-06-28T17:52:00')
   const rows = []
   for (let i = 0; i < count; i++) {
     const fullName = randomFullName()
     const category = categoryByWeight()
+    const block = pick(BLOCKS.filter((b) => b.categoryId === category.id))
     const methodId = methodByWeight()
     const method = PAYMENT_METHODS.find((m) => m.id === methodId)
     const minsAgo = i * 3 + Math.floor(rng() * 3)
@@ -189,6 +290,8 @@ export function generateRecentTransactions(count = 10) {
       methodColor: method.color,
       amount: category.price,
       category: category.label,
+      block: block.shortLabel,
+      seat: seededSeatForBlock(block),
       time: time.toLocaleTimeString('pt-PT', { hour: '2-digit', minute: '2-digit' }),
       status: rng() > 0.05 ? 'Confirmado' : 'Pendente',
     })
@@ -199,13 +302,14 @@ export function generateRecentTransactions(count = 10) {
 export const RECENT_TRANSACTIONS = generateRecentTransactions(10)
 
 export const GATES = [
-  { id: 'gate-n1', label: 'Entrada Norte - Porta 1', validated: 412, invalid: 9, status: 'Activa' },
-  { id: 'gate-n2', label: 'Entrada Norte - Porta 2', validated: 388, invalid: 14, status: 'Activa' },
-  { id: 'gate-n3', label: 'Entrada Norte - Porta 3', validated: 356, invalid: 7, status: 'Activa' },
-  { id: 'gate-s1', label: 'Entrada Sul - Porta 1', validated: 341, invalid: 11, status: 'Activa' },
-  { id: 'gate-s2', label: 'Entrada Sul - Porta 2', validated: 0, invalid: 0, status: 'Offline' },
-  { id: 'gate-v1', label: 'Entrada VIP - Porta 1', validated: 198, invalid: 2, status: 'Activa' },
-  { id: 'gate-v2', label: 'Entrada VIP - Porta 2', validated: 174, invalid: 3, status: 'Activa' },
+  { id: 'gate-n1', label: 'Entrada Norte - Porta 1', blockId: 'bloco-geral-norte', equipmentIds: ['hikvision', 'turnstar'], validated: 412, invalid: 9, status: 'Activa' },
+  { id: 'gate-n2', label: 'Entrada Norte - Porta 2', blockId: 'bloco-geral-norte', equipmentIds: ['hikvision', 'turnstar'], validated: 388, invalid: 14, status: 'Activa' },
+  { id: 'gate-n3', label: 'Entrada Norte - Porta 3', blockId: 'bloco-geral-norte', equipmentIds: ['hikvision', 'turnstar'], validated: 356, invalid: 7, status: 'Activa' },
+  { id: 'gate-s1', label: 'Entrada Sul - Porta 1', blockId: 'bloco-geral-sul', equipmentIds: ['hikvision', 'turnstar'], validated: 341, invalid: 11, status: 'Activa' },
+  { id: 'gate-s2', label: 'Entrada Sul - Porta 2', blockId: 'bloco-geral-sul', equipmentIds: ['hikvision', 'turnstar'], validated: 0, invalid: 0, status: 'Offline' },
+  { id: 'gate-v1', label: 'Entrada VIP - Porta 1', blockId: 'bloco-vip', equipmentIds: ['hikvision', 'turnstar'], validated: 198, invalid: 2, status: 'Activa' },
+  { id: 'gate-v2', label: 'Entrada VIP - Porta 2', blockId: 'bloco-vip', equipmentIds: ['hikvision', 'turnstar'], validated: 174, invalid: 3, status: 'Activa' },
+  { id: 'gate-camarote', label: 'Acesso Camarote', blockId: 'bloco-camarote', equipmentIds: ['android-pos'], validated: 142, invalid: 1, status: 'Activa' },
 ]
 
 export const SALES_BY_PAYMENT_METHOD = [
@@ -253,7 +357,7 @@ export const ADMIN_KPIS = {
   ticketsCapacity: 5000,
   totalRevenue: 1623450,
   occupancyRate: 76.9,
-  validatedEntries: 2134,
+  validatedEntries: 2011,
 }
 
 // Manual thousands-separator formatting (dot, Portuguese-style): relying on
@@ -281,14 +385,33 @@ export const MOCK_BUYER_DEFAULTS = {
 }
 
 export const INVALID_SCAN_REASONS = [
-  'Bilhete já utilizado',
-  'Bilhete inválido',
+  { id: 'used', label: 'Bilhete já utilizado' },
+  { id: 'invalid', label: 'Bilhete inválido' },
+  { id: 'wrong-block', label: 'Bloco ou categoria incorreto' },
 ]
 
-export const SCAN_VALID_SAMPLES = [
-  { name: 'Armando Mussa', category: 'Geral', event: 'Ferroviário vs Desportivo Maputo' },
-  { name: 'Fátima Cossa', category: 'VIP', event: 'Ferroviário vs Desportivo Maputo' },
-  { name: 'Nelson Tembe', category: 'Camarote', event: 'Ferroviário vs Desportivo Maputo' },
-  { name: 'Ivete Sitoe', category: 'Geral', event: 'Ferroviário vs Desportivo Maputo' },
-  { name: 'Domingos Machava', category: 'VIP', event: 'Ferroviário vs Desportivo Maputo' },
-]
+// A valid scan at a given gate must belong to that gate's own block/category,
+// otherwise the "wrong block" scenario below would contradict a "valid" one.
+export function generateValidScanForGate(gate, eventName) {
+  const block = getBlockById(gate.blockId)
+  const category = TICKET_CATEGORIES.find((c) => c.id === block.categoryId)
+  return {
+    name: randomFullName(),
+    category: category.label,
+    event: eventName,
+    block: block.name,
+    seat: generateSeatForBlock(block),
+  }
+}
+
+// The 'wrong-block' reason: a ticket issued for some other block, attempted
+// at this gate instead.
+export function generateWrongBlockAttemptForGate(gate) {
+  const otherBlocks = BLOCKS.filter((b) => b.id !== gate.blockId)
+  const ticketBlock = otherBlocks[Math.floor(Math.random() * otherBlocks.length)]
+  return {
+    name: randomFullName(),
+    ticketBlock: ticketBlock.name,
+    attemptedAt: gate.label,
+  }
+}
